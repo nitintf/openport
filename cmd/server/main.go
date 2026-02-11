@@ -1,0 +1,43 @@
+package main
+
+import (
+	"flag"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/nitintf/openport/internal/server"
+)
+
+func main() {
+	addr := flag.String("addr", ":8080", "public HTTP address to listen on")
+	tunnelAddr := flag.String("tunnel-addr", ":9090", "address for tunnel client connections")
+	domain := flag.String("domain", "localhost", "base domain for subdomain routing")
+	flag.Parse()
+
+	cfg := server.Config{
+		Addr:       *addr,
+		TunnelAddr: *tunnelAddr,
+		Domain:     *domain,
+	}
+
+	srv, err := server.New(cfg)
+	if err != nil {
+		log.Fatalf("failed to create server: %v", err)
+	}
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		log.Printf("openport server starting on %s (tunnels on %s)", cfg.Addr, cfg.TunnelAddr)
+		if err := srv.Start(); err != nil {
+			log.Fatalf("server error: %v", err)
+		}
+	}()
+
+	<-quit
+	log.Println("shutting down server...")
+	srv.Stop()
+}
