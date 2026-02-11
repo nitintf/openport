@@ -9,6 +9,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/nitintf/openport/internal/client"
+	"github.com/nitintf/openport/internal/version"
 )
 
 var (
@@ -111,7 +112,7 @@ func PrintBanner(tunnelURL, localAddr string) {
 	fmt.Println()
 	fmt.Printf("  %s %s\n",
 		logoStyle.Render("openport"),
-		versionStyle.Render("v0.1.0"),
+		versionStyle.Render(version.Full()),
 	)
 	fmt.Println()
 

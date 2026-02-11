@@ -2,19 +2,27 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/nitintf/openport/internal/server"
+	"github.com/nitintf/openport/internal/version"
 )
 
 func main() {
+	showVersion := flag.Bool("version", false, "print version and exit")
 	addr := flag.String("addr", ":8080", "public HTTP address to listen on")
 	tunnelAddr := flag.String("tunnel-addr", ":9090", "address for tunnel client connections")
 	domain := flag.String("domain", "localhost", "base domain for subdomain routing")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("openport-server %s\n", version.Full())
+		return
+	}
 
 	cfg := server.Config{
 		Addr:       *addr,
@@ -31,7 +39,7 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		log.Printf("openport server starting on %s (tunnels on %s)", cfg.Addr, cfg.TunnelAddr)
+		log.Printf("openport-server %s starting on %s (tunnels on %s)", version.Full(), cfg.Addr, cfg.TunnelAddr)
 		if err := srv.Start(); err != nil {
 			log.Fatalf("server error: %v", err)
 		}

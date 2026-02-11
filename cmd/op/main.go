@@ -10,6 +10,7 @@ import (
 
 	"github.com/nitintf/openport/internal/client"
 	"github.com/nitintf/openport/internal/ui"
+	"github.com/nitintf/openport/internal/version"
 )
 
 func main() {
@@ -17,14 +18,15 @@ func main() {
 	var subdomain string
 
 	rootCmd := &cobra.Command{
-		Use:   "op <port>",
-		Short: "Expose a local port to the internet",
-		Long:  "openport (op) creates a secure tunnel to expose a local service to the public internet.",
+		Use:     "op <port>",
+		Short:   "Expose a local port to the internet",
+		Long:    "openport (op) creates a secure tunnel to expose a local service to the public internet.",
+		Version: version.Full(),
 		Example: `  op 3000
   op 8080 --server tunnel.example.com:9090
   op 4000 --subdomain myapp`,
-		Args:         cobra.ExactArgs(1),
-		SilenceUsage: true,
+		Args:          cobra.ExactArgs(1),
+		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			localAddr := "localhost:" + args[0]
