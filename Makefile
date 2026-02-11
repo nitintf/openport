@@ -9,7 +9,7 @@ LDFLAGS = -s -w \
 
 PLATFORMS = linux/amd64 linux/arm64 darwin/amd64 darwin/arm64
 
-.PHONY: all build server op client clean test lint release
+.PHONY: all build server op client clean test lint release tag
 
 all: build
 
@@ -38,6 +38,11 @@ run-server:
 
 run-op:
 	go run -ldflags "$(LDFLAGS)" ./cmd/op -- 3000
+
+# Create a version tag (usage: make tag BUMP=patch|minor|major)
+BUMP ?= patch
+tag:
+	@./scripts/release.sh $(BUMP)
 
 # Build release binaries for all platforms
 release: clean
