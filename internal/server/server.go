@@ -52,6 +52,7 @@ func (s *Server) Start() error {
 	go s.acceptTunnels()
 
 	mux := http.NewServeMux()
+	mux.HandleFunc("/health", s.handleHealth)
 	mux.HandleFunc("/", s.handleHTTP)
 
 	s.httpSrv = &http.Server{
@@ -149,6 +150,11 @@ func (s *Server) handleNewTunnel(conn net.Conn) {
 	delete(s.tunnels, subdomain)
 	s.mu.Unlock()
 	log.Printf("tunnel unregistered: %s", subdomain)
+}
+
+func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprint(w, "ok")
 }
 
 func (s *Server) handleHTTP(w http.ResponseWriter, r *http.Request) {
