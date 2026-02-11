@@ -14,7 +14,7 @@ import (
 
 func main() {
 	showVersion := flag.Bool("version", false, "print version and exit")
-	addr := flag.String("addr", ":8080", "public HTTP address to listen on")
+	addr := flag.String("addr", "", "public HTTP address to listen on")
 	tunnelAddr := flag.String("tunnel-addr", ":9090", "address for tunnel client connections")
 	domain := flag.String("domain", "localhost", "base domain for subdomain routing")
 	flag.Parse()
@@ -22,6 +22,19 @@ func main() {
 	if *showVersion {
 		fmt.Printf("openport-server %s\n", version.Full())
 		return
+	}
+
+	// Railway / cloud platforms set PORT env var.
+	if *addr == "" {
+		port := os.Getenv("PORT")
+		if port == "" {
+			port = "8080"
+		}
+		*addr = ":" + port
+	}
+
+	if env := os.Getenv("DOMAIN"); env != "" && *domain == "localhost" {
+		*domain = env
 	}
 
 	cfg := server.Config{
