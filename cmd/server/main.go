@@ -33,6 +33,14 @@ func main() {
 		*addr = ":" + port
 	}
 
+	// Avoid tunnel port colliding with HTTP port.
+	if *tunnelAddr == *addr {
+		*tunnelAddr = ":6060"
+	}
+	if env := os.Getenv("TUNNEL_PORT"); env != "" {
+		*tunnelAddr = ":" + env
+	}
+
 	if env := os.Getenv("DOMAIN"); env != "" && *domain == "localhost" {
 		*domain = env
 	}
